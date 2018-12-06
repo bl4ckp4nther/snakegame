@@ -6,6 +6,7 @@ var snake = {
 		speed_x: 10,
 		speed_y: 10,
 		direction: "right",
+		pause: false,
 		init: function(){
 			for(i=0; i<=4; i++){
 				console.log('x',i,' y',0);
@@ -33,13 +34,22 @@ var snake = {
 			}
 			
 		},
+		
+		play: function(){
+			if(snake.pause){
+				clearInterval(game);
+			}
+			else{
+				game = setInterval(update,100);
+			}
+		},
 }
 
 document.addEventListener('keydown',keyPress);
 
 snake.init();
 snake.draw();
-setInterval(update,100);
+game = setInterval(update,100);
 
 function update(){
 	/*for(i=0; i<snake.coods.length; i++){
@@ -82,21 +92,32 @@ function update(){
 }
 
 function keyPress(e){
-	if(e.key=="ArrowRight"){
+	console.log(e);
+	if(e.key=="ArrowRight" && snake.direction != 'left'){
 		console.log('right');
         snake.direction = "right";
     }
-    else if(e.key=="ArrowLeft"){
+    else if(e.key=="ArrowLeft" && snake.direction != 'right'){
 		console.log('left');
         snake.direction = "left";
     }
-    else if(e.key=="ArrowDown"){
+    else if(e.key=="ArrowDown" && snake.direction != 'up'){
 		console.log('down');
         snake.direction = "down";
     }
-    else if(e.key=="ArrowUp"){
+    else if(e.key=="ArrowUp" && snake.direction != 'down'){
 		console.log('up');
         snake.direction = "up";
     }
-	update();
+    else if(e.key==" "){
+    	snake.pause = !snake.pause;
+    	snake.play();
+    }
+	
+	run_key_pressed = (e.key=="ArrowRight" || e.key=="ArrowLeft" || e.key=="ArrowDown" || e.key=="ArrowUp")
+	if (run_key_pressed && snake.pause){
+		snake.pause = false;
+		snake.play();
+		update();
+	}
 }

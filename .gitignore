@@ -1,3 +1,10 @@
 #Eclipse IDE
 .project
+.settings
+
+#gedit temp files
 .gitignore~
+todo~
+
+#todo
+todo
