@@ -40,7 +40,7 @@ var snake = {
 		},
 		
 		play: function(){
-			if(snake.pause){
+			if(this.pause){
 				clearInterval(game);
 			}
 			else{
@@ -57,17 +57,28 @@ var snake = {
 			return false;
 		},
 		
+		ateSelf: function(point){
+			if(this.coods.length>1){
+				for(i=1; i<this.coods.length; i++){
+					if (point.x == this.coods[i].x && point.y == this.coods[i].y){
+						return true;
+					}
+				}
+			}
+			return false;
+		},
+		
 		gameStart: function(){
-			snake.init();
-			snake.draw();
+			this.init();
+			this.draw();
 			food.createNew();
 			game = setInterval(update,100);
 		},
 		
 		gameOver: function(head, sn_direction){
 			clearInterval(game);
-			if(confirm("Game Over. Start New?"+head.x+" "+head.y+sn_direction)){
-				snake.gameStart();
+			if(confirm("Game Over. Start New?"/*+head.x+" "+head.y+sn_direction*/)){
+				this.gameStart();
 			}
 		},
 }
@@ -127,6 +138,7 @@ function update(){
 	
 	if(head.x == food.x && head.y == food.y){
 		snake.score += 1;
+		document.getElementById('scorediv_span').innerHTML = snake.score;
 		var tail = snake.coods[0];
 		var new_tail = JSON.parse(JSON.stringify(tail));
 		new_tail.x -= 1
