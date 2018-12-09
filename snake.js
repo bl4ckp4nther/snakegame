@@ -18,17 +18,22 @@ var snake = {
 		score: 0,
 		pause: false,
 		init: function(){
+			this.coods = [];
+			// for (var i=0; i<10; i++){
+			// 	this.coods.push({'x':i, 'y':0})
+			// }
 			this.coods = [{'x':0,'y':0}];
 			console.log('xxxxxxxxxxxx INIT xxxxxxxxxxxxxxx');
 			console.log('canvas width:'+W+' height:'+H);
 			snake.direction = 'right';
 			snake.score = 0;
+			document.getElementById('scorediv_span').innerHTML = snake.score
 		},
 
 		draw: function(){
-			
+
 			ctx.clearRect(0,0,W,H);
-			
+
 			for(i=0; i<this.coods.length; i++){
 				var x = this.coods[i].x;
 				var y = this.coods[i].y;
@@ -36,9 +41,9 @@ var snake = {
 				ctx.fillRect(x*this.cell_width,y*this.cell_height,this.cell_width,this.cell_height);
 			}
 			food.draw();
-			
+
 		},
-		
+
 		play: function(){
 			if(this.pause){
 				clearInterval(game);
@@ -47,7 +52,7 @@ var snake = {
 				game = setInterval(update,100);
 			}
 		},
-		
+
 		checkIntersection: function(point){
 			for(i=0; i<this.coods.length; i++){
 				if (point.x == this.coods[i].x && point.y == this.coods[i].y){
@@ -56,25 +61,27 @@ var snake = {
 			}
 			return false;
 		},
-		
-		ateSelf: function(point){
-			if(this.coods.length>1){
-				for(i=1; i<this.coods.length; i++){
-					if (point.x == this.coods[i].x && point.y == this.coods[i].y){
+
+		ateSelf: function(){
+			var snake_length = this.coods.length;
+			var head_o_snak = this.coods[snake_length-1]
+			if(snake_length>1){
+				for(i=0; i<snake_length-1; i++){
+					if (head_o_snak.x == this.coods[i].x && head_o_snak.y == this.coods[i].y){
 						return true;
 					}
 				}
 			}
 			return false;
 		},
-		
+
 		gameStart: function(){
 			this.init();
 			this.draw();
 			food.createNew();
 			game = setInterval(update,100);
 		},
-		
+
 		gameOver: function(head, sn_direction){
 			clearInterval(game);
 			if(confirm("Game Over. Start New?"/*+head.x+" "+head.y+sn_direction*/)){
@@ -106,7 +113,7 @@ var food = {
 			ctx.fillStyle = this.color;
 			ctx.fillRect(this.x*cell_width,this.y*cell_height,cell_width,cell_height);
 		},
-		
+
 }
 
 snake.gameStart();
@@ -118,7 +125,7 @@ function update(){
 	var head = snake.coods[snake_len-1];
 	snake.coods.shift();
 	var new_node = JSON.parse(JSON.stringify(head));
-	
+
 	if(snake.direction=='right'){
 		new_node.x += 1;
 		snake.coods.push(new_node);
@@ -135,7 +142,7 @@ function update(){
 		new_node.y -= 1;
 		snake.coods.push(new_node);
 	}
-	
+
 	if(head.x == food.x && head.y == food.y){
 		snake.score += 1;
 		document.getElementById('scorediv_span').innerHTML = snake.score;
@@ -145,18 +152,18 @@ function update(){
 		snake.coods.unshift(new_tail);
 		food.createNew();
 	}
-	
+
 	if(
 		((head.x+1)*snake.cell_width >= W && snake.direction=='right')
 		|| (head.x <= 0 && snake.direction=='left')
 		|| ((head.y+1)*snake.cell_height >= H && snake.direction=='down')
 		|| (head.y <= 0 && snake.direction=='up')
-		//||snake.checkIntersection(head)
+		||snake.ateSelf()
 		){
 		snake.gameOver(head, snake.direction);
 		return;
 	}
-	
+
 	snake.draw();
 }
 
@@ -178,7 +185,7 @@ function keyPress(e){
     	snake.pause = !snake.pause;
     	snake.play();
     }
-	
+
 	run_key_pressed = (e.key=="ArrowRight" || e.key=="ArrowLeft" || e.key=="ArrowDown" || e.key=="ArrowUp")
 	if (run_key_pressed){
 		if(snake.pause){
@@ -187,12 +194,12 @@ function keyPress(e){
 		}
 		update();
 	}
-	
+
 	if(e.key=="i"){
 		snake_len = snake.coods.length;
 		head = snake.coods[snake_len-1];
 		console.log(head);
 		console.log(snake.direction);
 	}
-	
+
 }
